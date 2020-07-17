@@ -1,0 +1,85 @@
+{% extends "papiro/base.html" %}
+{% load i18n %}
+
+
+{% block title %}{{ api.name }}{% endblock %}
+
+{% block jquery_internal %}
+    var popupWindow;
+    function isPopupWindowOpen(){
+        if(popupWindow){
+            if(popupWindow.closed) return false;
+            return true;
+        } else
+            return false;
+    }
+
+    django.jQuery(function() {
+
+        django.jQuery('a.jpopup').click(function() {
+            if(!isPopupWindowOpen()){
+                var href = django.jQuery(this).attr('href');
+                popupWindow = window.open(href, 'jpopup', 'height=720, width=550, toolbar=no');
+            } else {
+                popupWindow.focus();
+            }
+            return false;
+        });
+    });
+{% endblock %}
+
+
+{% block breadcrumbs %}
+    <a href="/api/">{% trans "Home" %}</a> &rsaquo; <a href="/api">{% trans "API Projects" %}</a> &rsaquo; {{ api.name }}
+{% endblock %}
+
+{% block content_main %}
+    <ul class="object-tools">
+        <li>
+            <a href="add/service/" class="addlink jpopup">{% trans "Add service" %}</a>
+        </li>
+    </ul>
+
+    <div class="module" id="changelist">
+        <div class="results">
+            <table id="result_list">
+                <thead>
+                    <tr>
+                        <th scope="col"  class="action-checkbox-column">
+                           <div class="text"><span><input type="checkbox" id="action-toggle"></span></div>
+                           <div class="clear"></div>
+                        </th>
+                        <th scope="col"  class="sortable column-name">
+                           <div class="text"><a href="?o=1">{% trans "name" %}</a></div>
+                           <div class="clear"></div>
+                        </th>
+                        <th scope="col"  class="sortable column-description">
+                           <div class="text"><a href="?o=2">{% trans "description" %}</a></div>
+                           <div class="clear"></div>
+                        </th>
+                        <th scope="col"  class="sortable column-http_method">
+                           <div class="text"><a href="?o=3">{% trans "method" %}</a></div>
+                           <div class="clear"></div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% if service_list %}
+                    {% for service in service_list %}
+                    <tr class="row1">
+                        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="1" class="action-select"></td>
+                        <th class="field-name"><a href="/api/service/{{ service.id }}">{{ service.name }}</a></th>
+                        <td class="field-description">{{ service.description }}</td>
+                        <td class="field-http_method">{{ service.http_method }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr class="row1">
+                        <td colspan="4">{% trans "No services found" %}</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

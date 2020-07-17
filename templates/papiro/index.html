@@ -1,0 +1,72 @@
+{% extends "papiro/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "API Projects" %}{% endblock %}
+
+
+{% block css_internal %}
+{% endblock %}
+
+{% block jquery_internal %}
+    var popupWindow;
+    function isPopupWindowOpen(){
+        if(popupWindow){
+            if(popupWindow.closed) return false;
+            return true;
+        } else
+            return false;
+    }
+
+    $ = django.jQuery;
+    $(function() {
+        $('a.jpopup').click(function() {
+            if(!isPopupWindowOpen()){
+                var href = django.jQuery(this).attr('href');
+                popupWindow = window.open(href, 'jpopup', 'height=420, width=550, toolbar=no');
+            } else {
+                popupWindow.focus();
+            }
+            return false;
+        });
+    });
+{% endblock %}
+
+{% block breadcrumbs %}
+    <a href="/api/">{% trans "Home" %}</a> &rsaquo; {% trans "API Projects" %}
+{% endblock %}
+
+{% block content_main %}
+    <input type="hidden" id="_csrf" value="{{csrf_token}}">
+
+    <div class="app-descriptor module">
+        <ul class="object-tools">
+            <li>
+                <a href="add/" class="addlink jpopup">{% trans "New API Project" %}</a>
+            </li>
+        </ul>
+        <table style="min-width:50%;">
+            <caption>
+                <a href="/admin/descriptor/" class="section" title="API's">API's</a>
+            </caption>
+            {% if api_list %}
+                {% for api in api_list %}
+                    <tr class="model-api">
+                        <th scope="row" data-field="name" data-field-label="{% trans 'name' %}" data-id="{{api.id}}">
+                                <a href="{{ api.id }}/services/">{{ api.name }}</a>
+                        </th>
+                        <td style="color:#999;" class="editable" data-field="description" data-field-label="{% trans 'description' %}" data-id="{{api.id}}">
+                            <span>{{ api.description }}</span>
+                        </td>
+                        <!-- <td><a href="/descriptor/api/add/" class="addlink">Adicionar</a></td>
+                        <td><a href="/descriptor/api/" class="changelink">Modificar</a></td>
+                        -->
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr class="model-api">
+                    <td colspan="2">{% trans "No API found" %}</td>
+                </tr>
+            {% endif %}
+        </table>
+    </div>
+{% endblock %}

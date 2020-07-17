@@ -1,0 +1,162 @@
+{% extends "papiro/base.html" %}
+{% load i18n %}
+
+{% block jquery_internal %}
+    var popupWindow;
+    function isPopupWindowOpen(){
+        if(popupWindow){
+            if(popupWindow.closed) return false;
+            return true;
+        } else
+            return false;
+    }
+
+    $ = django.jQuery;
+    $(function() {
+        $('a.jpopup').click(function() {
+            if(!isPopupWindowOpen()){
+                var href = django.jQuery(this).attr('href');
+                popupWindow = window.open(href, 'jpopup', 'height=600, width=500, toolbar=no');
+            } else {
+                popupWindow.focus();
+            }
+            return false;
+        });
+
+    });
+{% endblock %}
+
+{% block breadcrumbs %}
+    <a href="/api/">Início</a> &rsaquo; <a href="/api/">Projetos de API's</a> &rsaquo; <a href="/api/{{service.api.id}}/services"> {{ service.api.name }}</a> &rsaquo; {{ service.name }}
+{% endblock %}
+
+{% block title %}{{ service.name }}{% endblock %}
+
+{% block content_main %}
+<ul class="object-tools">
+    <li>
+        <a href="/admin/descriptor/service/2/history/" class="historylink">Histórico</a>
+    </li>
+</ul>
+
+<form id="service_form" novalidate="">
+<div>
+    <fieldset class="module aligned ">
+        <div class="form-row field-name">
+            <div>
+                <label class="required" for="id_description">Descrição:</label>
+                <span name="description" id="id_description" class="editable" data-field-type="textarea" data-field="description" data-field-label="{% trans 'description' %}" data-id="{{service.id}}">
+                    <span>
+                    {% if service.description %}
+                        {{ service.description }}
+                    {% else %}
+                        <em>{% trans "Click to add description" %}</em>
+                    {% endif %}
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="form-row field-name">
+            <div>
+                <label class="required" for="id_status">Status:</label>
+                <span name="status" id="id_status" class="editable" data-field-type="select" data-field="status" data-field-label="{% trans 'status' %}" data-id="{{service.id}}">
+                    <span>
+                        {{ service.get_status_display }}
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="form-row field-name">
+            <div>
+                <label class="required" for="id_iib">Operação IIB:</label>
+                <span name="iib" id="id_iib">
+                    {% if service.iib_service_number %}
+                    {{ service.iib_service_number }}
+                        {% if service.iib_service_number %}
+                             v.{{ service.iib_service_version_number }}
+                        {% endif %}
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="form-row field-name">
+            <div>
+                <label class="required" for="id_endpoint">Endpoint:</label>
+                <span name="endpoint" id="id_endpoint">{{ service.endpoint_uri }}</span>
+            </div>
+        </div>
+    </fieldset>
+</div>
+</form>
+<div>
+{% if parameter_groups %}
+    {% for parameter_group in parameter_groups %}
+    <div class="form-row" id="group_{{parameter_group.id}}">
+        <div class="module" id="changelist">
+            <div class="results">
+                <table id="result_list">
+                    <caption>
+                        <a href="/admin/descriptor/" class="section" title="API's">{{ parameter_group.get_type_display }}</a>
+                    </caption>
+                    {% if parameter_group.parameters.all %}
+                    <thead>
+                        <tr>
+                            <th scope="col"  class="action-checkbox-column">
+                               <div class="text"></div>
+                               <div class="clear"></div>
+                            </th>
+                            <th scope="col"  class="column-name">
+                               <div class="text">{% trans "name" %}</div>
+                               <div class="clear"></div>
+                            </th>
+                            <th scope="col"  class="column-description">
+                               <div class="text">{% trans "format" %}</div>
+                               <div class="clear"></div>
+                            </th>
+                            <th scope="col"  class="column-size">
+                               <div class="text">{% trans "size" %}</div>
+                               <div class="clear"></div>
+                            </th>
+                            <th scope="col"  class="column-required">
+                               <div class="text">{% trans "required" %}</div>
+                               <div class="clear"></div>
+                            </th>
+                            <th scope="col"  class="column-domain_rules">
+                               <div class="text">{% trans "domain rules" %}</div>
+                               <div class="clear"></div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for parameter in parameter_group.parameters.all %}
+                            <tr class="row1">
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ parameter.name }}</td>
+                                <td >{{ parameter.get_format_display }}</td>
+                                <td >{{ parameter.size }}</td>
+                                <td >{{ parameter.required|yesno:"Sim,Não,Não" }}</td>
+                                <td >{{ parameter.domain_rules }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr class="row1">
+                            <td colspan="4">{% trans "no parameters yet." %}</td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <ul class="object-tools">
+            <li>
+                <a href="parameter_group/{{ parameter_group.id }}/add/parameter/" class="addlink jpopup">{% trans "Add service" %}</a>
+            </li>
+        </ul>
+    </div>
+    {% endfor %}
+{% else %}
+    <h2>{% trans "No parameter groups yet." %}</h2>
+{% endif %}
+
+</div>
+{% endblock %}
