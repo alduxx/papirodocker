@@ -41,7 +41,7 @@
     <div class="app-descriptor module">
         <ul class="object-tools">
             <li>
-                <a href="add/" class="addlink jpopup">{% trans "New API Project" %}</a>
+                <a href="{% url 'popup_add_api' %}" class="addlink jpopup">{% trans "New API Project" %}</a>
             </li>
         </ul>
         <table style="min-width:50%;">
@@ -52,7 +52,7 @@
                 {% for api in api_list %}
                     <tr class="model-api">
                         <th scope="row" data-field="name" data-field-label="{% trans 'name' %}" data-id="{{api.id}}">
-                                <a href="{{ api.id }}/services/">{{ api.name }}</a>
+                            <a href="{% url 'list_services' api.id %}">{{ api.name }}</a>
                         </th>
                         <td style="color:#999;" class="editable" data-field="description" data-field-label="{% trans 'description' %}" data-id="{{api.id}}">
                             <span>{{ api.description }}</span>

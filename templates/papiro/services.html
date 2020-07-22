@@ -36,7 +36,7 @@
 {% block content_main %}
     <ul class="object-tools">
         <li>
-            <a href="add/service/" class="addlink jpopup">{% trans "Add service" %}</a>
+            <a href="{% url 'popup_add_service' api.id %}" class="addlink jpopup">{% trans "Add service" %}</a>
         </li>
     </ul>
 
@@ -68,7 +68,9 @@
                     {% for service in service_list %}
                     <tr class="row1">
                         <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="1" class="action-select"></td>
-                        <th class="field-name"><a href="/api/service/{{ service.id }}">{{ service.name }}</a></th>
+                        <th class="field-name">
+                            <a href="{% url 'service_detail_by_name' api.id service.name %}">{{ service.name }}</a>
+                        </th>
                         <td class="field-description">{{ service.description }}</td>
                         <td class="field-http_method">{{ service.http_method }}</td>
                     </tr>

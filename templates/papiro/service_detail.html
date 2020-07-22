@@ -35,7 +35,13 @@
 {% block content_main %}
 <ul class="object-tools">
     <li>
-        <a href="/admin/descriptor/service/2/history/" class="historylink">Histórico</a>
+        {% trans 'Version' %}: 
+        <select id="service_tags">
+            {% for service in all_services %}
+                <option value="{{service.tag}}">{% if service.tag == 0 %}SNAPSHOT{% else %}{{service.tag}}{% endif %}</option>
+            {% endfor %}
+        </select>
+        <button type="button" id="change_service_version">{% trans "go" %}</button>
     </li>
 </ul>
 
@@ -149,7 +155,10 @@
         </div>
         <ul class="object-tools">
             <li>
-                <a href="parameter_group/{{ parameter_group.id }}/add/parameter/" class="addlink jpopup">{% trans "Add service" %}</a>
+                {% if service.tag == 0 %}
+                <!-- editable only if service tag is SNAPSHOT (0) -->
+                <a href="{% url 'popup_add_parameter' service.id parameter_group.id %}" class="addlink jpopup">{% trans "Add parameter" %}</a>
+                {% endif %}
             </li>
         </ul>
     </div>

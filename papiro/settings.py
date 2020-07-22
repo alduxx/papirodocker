@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': 'papirodb',
         'USER':  os.environ.get('DB_USER', None),
         'PASSWORD':  os.environ.get('DB_PASSWORD', None),
-        'HOST': 'mysql',
+        'HOST':  os.environ.get('DB_HOST', '127.0.0.1'),
         'PORT': '3306',
     }
 }

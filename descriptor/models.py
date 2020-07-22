@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+
 class Api(models.Model):
     name = models.CharField(_('name'), max_length=60, unique=True)
     description = models.TextField(_('description'), blank=True)
@@ -35,6 +36,7 @@ class Service(models.Model):
     endpoint_uri = models.CharField(_('endpoint uri'), max_length=200, blank=True, default="")
     http_method = models.CharField(_('method'), max_length=6, blank=False, null=False, choices=HTTP_METHODS)
     enabled = models.BooleanField(_('enabled'), default=True)
+    tag = models.PositiveSmallIntegerField(_('tag'), default=0)
 
     def __str__(self):
         return self.name

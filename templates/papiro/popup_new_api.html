@@ -38,7 +38,7 @@
         <div id="content" class="colM">
             <h1>{% trans "New Api Project" %}</h1>
             <div id="content-main">
-            <form action="" method="post">
+            <form action="" method="post" autocomplete="off">
                 {% csrf_token %}
                 <table>
                 {{ form.as_table }}
