@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from .models import Api, Service, ParameterGroup
+from .models import Api, Service, Parameter, ParameterGroup
 from .forms import ParameterForm, ServiceForm, ApiForm
 
 @login_required
@@ -16,8 +16,13 @@ def index(request):
 
 
 def list_services(request, api_id):
+    """
+    Show list of services from api project.
+    Only shows SNAPSHOT versions
+    """
+    SNAPSHOT = 0
     api = Api.objects.get(pk=api_id)
-    service_list = Service.objects.filter(api=api).order_by('name')
+    service_list = Service.objects.filter(api=api, tag=SNAPSHOT).order_by('name')
     context = {'api': api, 'service_list':service_list}
     return render(request, 'papiro/services.html', context)
 
@@ -34,11 +39,50 @@ def service_detail_by_name(request, api_id, service_name):
     context = {'service': service, 'all_services': all_services_with_name, 'parameter_groups': parameter_groups}
     return render(request, 'papiro/service_detail.html', context)
 
-def service_detail(request, service_id):
-    service = Service.objects.get(pk=service_id)
+
+def service_detail_by_name_and_tag(request, api_id, service_name, tag):
+    """
+    Render service detail by api_id and service name and tag
+    """
+    all_services_with_name = Service.objects.filter(name=service_name).order_by('tag')
+    # get working service with tag 0 (not a closed service)
+    service = Service.objects.get(name=service_name, tag=tag)
     parameter_groups = ParameterGroup.objects.filter(service=service).order_by('type')
-    context = {'service': service, 'parameter_groups': parameter_groups}
+    # pass all_services_with_name to create dropdown with tags
+    context = {'service': service, 'all_services': all_services_with_name, 'parameter_groups': parameter_groups}
     return render(request, 'papiro/service_detail.html', context)
+
+
+def create_new_tag(request, service_id):
+    """
+    Creates new tag from SNAPSHOT version
+    """
+    if request.method == "POST":
+        service = Service.objects.get(pk=service_id)
+
+        last_version_service = Service.objects.filter(name=service.name).order_by('-tag')[0]
+
+        parameter_groups = ParameterGroup.objects.filter(service=service) #saves for later
+
+        service.pk = None # clones the service object
+        service.tag = last_version_service.tag + 1
+        service.save()
+
+        for pgroup in parameter_groups:
+            # clones parameter groups
+            parameters = Parameter.objects.filter(parameter_group=pgroup) # saves up
+            pgroup.pk = None
+            pgroup.service = service
+            pgroup.save()
+
+            for param in parameters:
+                param.pk = None
+                param.parameter_group = pgroup
+                param.save()
+
+        return HttpResponse(service.tag)
+    else:
+        return HttpResponse('error')
 
 
 def popup_add_parameter(request, service_id, parameter_group_id):

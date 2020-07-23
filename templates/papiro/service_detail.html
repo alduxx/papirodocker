@@ -1,6 +1,27 @@
 {% extends "papiro/base.html" %}
 {% load i18n %}
 
+{% block css_internal %}
+    button.go {
+        font-size: 13px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: #fff;
+        box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
+        cursor: pointer;
+        height: 28px;
+        line-height: 1;
+        padding: 6px 8px;
+        margin: 0;
+        color: #333;
+    }
+
+    .tag_control button {padding: 6px 15px;border: none;border-radius: 4px;color: #fff;
+        cursor: pointer;margin-left:3px;background: #205067;margin: 0 0 0 8px;
+        text-transform: uppercase;padding: 12px 15px;}
+
+{% endblock %}
+
 {% block jquery_internal %}
     var popupWindow;
     function isPopupWindowOpen(){
@@ -23,6 +44,55 @@
             return false;
         });
 
+        $("#change_service_version").click(function(){
+            var tag = $("#service_tags").val();
+            if(tag==0){
+                document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}";
+            } else {
+                document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}/tag/" + tag;
+            }
+        });
+
+        function csrfSafeMethod(method) {
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", $("#_csrf").val());
+                }
+            }
+        });
+
+        $("#commit_tag").click(function(){
+            if(confirm("{% trans 'Are you sure you want close this version and generate a new tag?'%}")){
+                var _url = "{% url 'create_new_tag' service.id %}";
+                var _data = '{"commit": "true" }';
+                var returned_version;
+                console.log(_url);
+                console.log(_data);
+                $.ajax({
+                    url : _url,
+                    type : 'POST',
+                    data : _data,
+                    headers : {
+                        'Content-Type' : 'application/json'
+                    },
+                    success : function(response, textStatus, jqXhr) {
+                        console.log("Successfully Posted!", textStatus);
+                        returned_version = response;
+                        console.log(returned_version);
+                    },
+                    error : function(jqXHR, textStatus, errorThrown) {
+                        console.log("The following error occured: " + textStatus, errorThrown);
+                    },
+                    complete : function() {
+                        document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}/tag/" + returned_version;
+                    }
+                });
+            }
+        });
+
     });
 {% endblock %}
 
@@ -30,22 +100,23 @@
     <a href="/api/">Início</a> &rsaquo; <a href="/api/">Projetos de API's</a> &rsaquo; <a href="/api/{{service.api.id}}/services"> {{ service.api.name }}</a> &rsaquo; {{ service.name }}
 {% endblock %}
 
-{% block title %}{{ service.name }}{% endblock %}
+{% block title %}{{ service.name }} <em>[{% if service.tag == 0 %}SNAPSHOT{% else %}v. {{service.tag}}{% endif %}]</em>{% endblock %}
 
 {% block content_main %}
 <ul class="object-tools">
     <li>
         {% trans 'Version' %}: 
         <select id="service_tags">
-            {% for service in all_services %}
-                <option value="{{service.tag}}">{% if service.tag == 0 %}SNAPSHOT{% else %}{{service.tag}}{% endif %}</option>
+            {% for svc in all_services %}
+                <option value="{{svc.tag}}" {% if svc.tag == service.tag %}selected{% endif %}>{% if svc.tag == 0 %}SNAPSHOT{% else %}{{svc.tag}}{% endif %}</option>
             {% endfor %}
         </select>
-        <button type="button" id="change_service_version">{% trans "go" %}</button>
+        <button type="button" id="change_service_version" class="go">{% trans "Go" %}</button>
     </li>
 </ul>
 
 <form id="service_form" novalidate="">
+<input type="hidden" id="_csrf" value="{{csrf_token}}">
 <div>
     <fieldset class="module aligned ">
         <div class="form-row field-name">
@@ -166,6 +237,12 @@
 {% else %}
     <h2>{% trans "No parameter groups yet." %}</h2>
 {% endif %}
+</div>
 
+<div class="tag_control">
+    {% if service.tag == 0 %}
+    <!-- only shows button if tag == 0 (SNAPSHOT) -->
+    <button id="commit_tag">{% trans 'Commit tag' %}</button>
+    {% endif %}
 </div>
 {% endblock %}

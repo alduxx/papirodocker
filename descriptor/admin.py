@@ -8,7 +8,7 @@ class ParameterGroupTabularInline(admin.TabularInline):
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
     inlines = [ParameterGroupTabularInline]
-    list_display = ('name', 'description', 'http_method')
+    list_display = ('name', 'description', 'tag', 'http_method')
     class Meta:
         model = Service
 
