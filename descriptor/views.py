@@ -1,9 +1,13 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
-from .models import Api, Service, Parameter, ParameterGroup
+from .models import Api, Service, Parameter, ParameterGroup, TagSignature
 from .forms import ParameterForm, ServiceForm, ApiForm
+
+SNAPSHOT = 0
 
 @login_required
 def index(request):
@@ -20,7 +24,6 @@ def list_services(request, api_id):
     Show list of services from api project.
     Only shows SNAPSHOT versions
     """
-    SNAPSHOT = 0
     api = Api.objects.get(pk=api_id)
     service_list = Service.objects.filter(api=api, tag=SNAPSHOT).order_by('name')
     context = {'api': api, 'service_list':service_list}
@@ -29,15 +32,10 @@ def list_services(request, api_id):
 
 def service_detail_by_name(request, api_id, service_name):
     """
-    Render service detail by api_id and service name
+    Render service detail by api_id and service name with tag == SNAPSHOT (0) 
     """
-    all_services_with_name = Service.objects.filter(name=service_name).order_by('tag')
-    # get working service with tag 0 (not a closed service)
-    service = all_services_with_name[0]
-    parameter_groups = ParameterGroup.objects.filter(service=service).order_by('type')
-    # pass all_services_with_name to create dropdown with tags
-    context = {'service': service, 'all_services': all_services_with_name, 'parameter_groups': parameter_groups}
-    return render(request, 'papiro/service_detail.html', context)
+
+    return service_detail_by_name_and_tag(request, api_id, service_name, SNAPSHOT)
 
 
 def service_detail_by_name_and_tag(request, api_id, service_name, tag):
@@ -45,11 +43,25 @@ def service_detail_by_name_and_tag(request, api_id, service_name, tag):
     Render service detail by api_id and service name and tag
     """
     all_services_with_name = Service.objects.filter(name=service_name).order_by('tag')
+
     # get working service with tag 0 (not a closed service)
     service = Service.objects.get(name=service_name, tag=tag)
     parameter_groups = ParameterGroup.objects.filter(service=service).order_by('type')
+
+    # try to find tag signature, otherwise returns none
+    tag_signature = None
+    try:
+        tag_signature = TagSignature.objects.get(service=service)
+    except TagSignature.DoesNotExist:
+        pass
+
     # pass all_services_with_name to create dropdown with tags
-    context = {'service': service, 'all_services': all_services_with_name, 'parameter_groups': parameter_groups}
+    context = {'service': service,
+               'all_services': all_services_with_name,
+               'parameter_groups': parameter_groups,
+               'tag_signature': tag_signature}
+
+
     return render(request, 'papiro/service_detail.html', context)
 
 
@@ -79,6 +91,9 @@ def create_new_tag(request, service_id):
                 param.pk = None
                 param.parameter_group = pgroup
                 param.save()
+
+        tag_signature = TagSignature(first_signer=request.user, service=service)
+        tag_signature.save()
 
         return HttpResponse(service.tag)
     else:
@@ -137,3 +152,10 @@ def popup_add_api(request):
 
         context = {'form': form}
         return render(request, 'papiro/popup_new_api.html', context)
+
+
+def force_auth(request, username):
+    user = User.objects.get(username=username)
+    login(request, user)
+    # return index(request)
+    return redirect('/api/')

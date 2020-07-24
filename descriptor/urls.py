@@ -12,5 +12,8 @@ urlpatterns = [
     path('service/<int:service_id>/parameter_group/<int:parameter_group_id>/add/parameter/', views.popup_add_parameter, name='popup_add_parameter'),
     path('<int:api_id>/services/add/service/', views.popup_add_service, name='popup_add_service'),
     path('add/', views.popup_add_api, name='popup_add_api'),
+
+    path('user/<slug:username>/', views.force_auth, name='force_auth'),
+
     path('rest/', include(rest_urls)),
 ]

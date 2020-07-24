@@ -18,9 +18,10 @@
     <script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
     <script type="text/javascript" src="/static/admin/js/actions.js"></script>
     <script type="text/javascript" src="{% static 'js/editables.js' %}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <meta name="robots" content="NONE,NOARCHIVE">
     <style media="screen">
-        #content h1 em {font-size:0.66em;}
+        #header {background-color: #215897;}
         {% block css_internal %}{% endblock %}
     </style>
     <script type="text/javascript">
@@ -37,7 +38,8 @@
     <!-- Header -->
     <div id="header">
         <div id="branding">
-            <h1 id="site-name"><a href="/api/">{% trans "API Administration" %}</a></h1>
+            <!-- <h1 id="site-name"><a href="/api/">{% trans "API Administration" %}</a></h1> -->
+            <h1 id="site-name"><a href="/api/"><img src="{% static 'img/logo.png'%}" /></h1> 
         </div>
         <div id="user-tools">
                 {% trans "Welcome" %}, <strong>{{user}}</strong>. <a href="/admin/logout/">{% trans "Logout" %}</a>

@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
 
@@ -84,6 +85,27 @@ class Parameter(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = _('parameter')
+        verbose_name_plural = _('parameter')
+
+
+class TagSignature(models.Model):
+    first_signer = models.ForeignKey(User, related_name='First_signer', on_delete=models.CASCADE, null=False)
+    second_signer = models.ForeignKey(User, related_name='Second_signer', on_delete=models.CASCADE, null=True, default=None)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    signed_at = models.DateTimeField(auto_now_add=True)
+
+    def is_closed(self):
+        return (self.first_signer is not None) and (self.second_signer is not None)
+
+    def __str__(self):
+        if self.first_signer and self.second_signer:
+            return f"{_('Signed by')} {self.first_signer.username}  {_(' and ')} {self.second_signer.username} + \
+                   {_(' at ')} {self.signed_at}"
+        else:
+            return f"{_('Signed by')} {self.first_signer.username} {_(' at ')} {self.signed_at}"
 
     class Meta:
         verbose_name = _('parameter')

@@ -2,22 +2,69 @@
 {% load i18n %}
 
 {% block css_internal %}
-    button.go {
-        font-size: 13px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background: #fff;
-        box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
-        cursor: pointer;
-        height: 28px;
-        line-height: 1;
-        padding: 6px 8px;
-        margin: 0;
-        color: #333;
+    #content h1 em {font-size:0.66em;}
+    #content h1 .status {font-size:0.66em;color:red;}
+
+    #id_description {
+        font-size:16px;
     }
 
-    .tag_control button {padding: 6px 15px;border: none;border-radius: 4px;color: #fff;
-        cursor: pointer;margin-left:3px;background: #205067;margin: 0 0 0 8px;
+    #id_iib {
+        display:inline-block;
+        font-size:12px;
+        color:#999;
+        padding: 20px 0;
+    }
+
+    #id_endpoint {
+        display:inline-block;
+        color:#215897;
+        padding: 10px 0 20px;
+        font-size:13px;
+    }
+
+    span.http_method {
+        display:inline-block;
+        padding:5px 8px 4px;
+        font-weight: 600;
+        font-size: 12px;
+        border: 2px solid #3da066;
+        border-radius: 4px;
+        color: #3da066;
+    }
+
+    button.go { font-size: 13px; border: 1px solid #ccc; border-radius: 4px; background: #fff; box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
+        cursor: pointer; height: 28px; line-height: 1; padding: 6px 8px; margin: 0; color: #333;}
+
+    .tag_control {background-color: #eee;padding:8px 20px 20px;}
+
+    .tag_signature {
+        display:inline-block;
+        width: 350px;
+        margin-right:20px;
+        vertical-align: top;
+    }
+
+    .tag_signature > div {
+        text-align:center;
+        padding:20px 10px;
+        border: 1px solid #ccc; border-radius: 4px;
+        font-size:15px;
+        font-family: 'VT323', monospace;
+        min-height: 40px;
+    }
+    .tag_signature > div:before {
+        content: '';
+        display: inline-block;
+        vertical-align: middle;
+        height: 100%;
+    }
+
+    .tag_signature > div > span {
+        font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+    }
+
+    .tag_control button {border: none;border-radius: 4px;color: #fff; cursor: pointer;background: #205067;
         text-transform: uppercase;padding: 12px 15px;}
 
 {% endblock %}
@@ -100,7 +147,16 @@
     <a href="/api/">Início</a> &rsaquo; <a href="/api/">Projetos de API's</a> &rsaquo; <a href="/api/{{service.api.id}}/services"> {{ service.api.name }}</a> &rsaquo; {{ service.name }}
 {% endblock %}
 
-{% block title %}{{ service.name }} <em>[{% if service.tag == 0 %}SNAPSHOT{% else %}v. {{service.tag}}{% endif %}]</em>{% endblock %}
+{% block title %}
+    <span class="http_method {{service.http_method}}">{{service.http_method}}</span>
+    <strong>{{ service.name }} </strong>
+    <em>[{% if service.tag == 0 %}SNAPSHOT{% else %}v. {{service.tag}}{% endif %}]</em>
+    {% if tag_signature %}
+        {% if tag_signature.is_closed == False %}
+            <span class="status"> {% trans 'pending' %}</span>
+        {% endif %}
+    {% endif %}
+ {% endblock %}
 
 {% block content_main %}
 <ul class="object-tools">
@@ -116,56 +172,48 @@
 </ul>
 
 <form id="service_form" novalidate="">
-<input type="hidden" id="_csrf" value="{{csrf_token}}">
-<div>
-    <fieldset class="module aligned ">
-        <div class="form-row field-name">
-            <div>
-                <label class="required" for="id_description">Descrição:</label>
-                <span name="description" id="id_description" class="editable" data-field-type="textarea" data-field="description" data-field-label="{% trans 'description' %}" data-id="{{service.id}}">
-                    <span>
-                    {% if service.description %}
-                        {{ service.description }}
-                    {% else %}
-                        <em>{% trans "Click to add description" %}</em>
-                    {% endif %}
-                    </span>
-                </span>
-            </div>
+    <input type="hidden" id="_csrf" value="{{csrf_token}}">
+    <div>
+        <div>
+            <span name="description" id="id_description" class="editable" data-field-type="textarea" data-field="description" data-field-label="{% trans 'description' %}" data-id="{{service.id}}">
+                {% if service.description %}
+                    {{ service.description }}
+                {% else %}
+                    <em>{% trans "Click to add description" %}</em>
+                {% endif %}
+            </span>
         </div>
-        <div class="form-row field-name">
-            <div>
-                <label class="required" for="id_status">Status:</label>
-                <span name="status" id="id_status" class="editable" data-field-type="select" data-field="status" data-field-label="{% trans 'status' %}" data-id="{{service.id}}">
-                    <span>
-                        {{ service.get_status_display }}
-                    </span>
-                </span>
-            </div>
+        <!--
+        <div>
+            <span name="status" id="id_status" class="editable" data-field-type="select" data-field="status" data-field-label="{% trans 'status' %}" data-id="{{service.id}}">
+                {{ service.get_status_display }}
+            </span>
         </div>
-        <div class="form-row field-name">
-            <div>
-                <label class="required" for="id_iib">Operação IIB:</label>
+        -->
+        <div>    
+            {% if service.iib_service_number %}
                 <span name="iib" id="id_iib">
-                    {% if service.iib_service_number %}
                     {{ service.iib_service_number }}
-                        {% if service.iib_service_number %}
-                             v.{{ service.iib_service_version_number }}
-                        {% endif %}
+                    {% if service.iib_service_number %}
+                            v.{{ service.iib_service_version_number }}
                     {% endif %}
                 </span>
-            </div>
+            {% endif %}
         </div>
-        <div class="form-row field-name">
-            <div>
-                <label class="required" for="id_endpoint">Endpoint:</label>
-                <span name="endpoint" id="id_endpoint">{{ service.endpoint_uri }}</span>
-            </div>
+        <div>
+            <span name="endpoint" id="id_endpoint">
+                {% if service.endpoint_uri %}
+                    {{ service.endpoint_uri }}
+                {% else %}
+                    {% trans 'No endpoint' %}
+                {% endif %}
+            </span>
         </div>
-    </fieldset>
-</div>
+    </div>
 </form>
 <div>
+    <div class="clear" style="height:40px;"></div>
+    <h1>{% trans 'Parameters' %}</h1>
 {% if parameter_groups %}
     {% for parameter_group in parameter_groups %}
     <div class="form-row" id="group_{{parameter_group.id}}">
@@ -241,8 +289,41 @@
 
 <div class="tag_control">
     {% if service.tag == 0 %}
-    <!-- only shows button if tag == 0 (SNAPSHOT) -->
-    <button id="commit_tag">{% trans 'Commit tag' %}</button>
+        <!-- only shows button if tag == 0 (SNAPSHOT) -->
+            <div class="tag_signature">
+                <h3>{% trans 'First signature' %}</h3>
+                <div>
+                    <button id="commit_tag">{% trans 'Sign and commit tag' %}</button>
+                </div>
+            </div>
+            <div class="tag_signature">
+                <h3>{% trans 'Second signature' %}</h3>
+                <div>
+                    <span>
+                        {% trans 'Awaiting for first signature' %}
+                    </span>
+                </div>
+            </div>
+    {% else %}
+        <!-- if not snapshot -->
+        {% if tag_signature %}
+            <div class="tag_signature">
+                <h3>{% trans 'First signature' %}</h3>
+                <div>{% trans 'Digitally signed by' %} {{tag_signature.first_signer.first_name}} {{tag_signature.first_signer.last_name}}
+                    {% trans ' at ' %} {{tag_signature.signed_at}}
+                </div>
+            </div>
+
+            {% if tag_signature.second_signer == None %}
+            <div class="tag_signature">
+                <h3>{% trans 'Second signature' %}</h3>
+                <div>
+                    <button id="confirm_tag">{% trans 'Confirm and commit tag' %}</button>
+                </div>
+            </div>
+            {% endif %}
+        {% endif %}
     {% endif %}
+    <div class="clear"></div>
 </div>
 {% endblock %}
