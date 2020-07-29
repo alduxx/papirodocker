@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-23 22:14+0000\n"
+"POT-Creation-Date: 2020-07-28 22:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,14 +17,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: descriptor/models.py:7 descriptor/models.py:32 descriptor/models.py:79
-#: templates/papiro/index.html:54 templates/papiro/service_detail.html:211
+#: descriptor/models.py:7 descriptor/models.py:32 descriptor/models.py:80
+#: templates/papiro/index copy.html:54 templates/papiro/service_detail.html:165
 #: templates/papiro/services.html:53
 msgid "name"
 msgstr "nome"
 
-#: descriptor/models.py:8 descriptor/models.py:33
-#: templates/papiro/index.html:57 templates/papiro/service_detail.html:150
+#: descriptor/models.py:8 descriptor/models.py:33 templates/papiro/index
+#: copy.html:57 templates/papiro/service_detail.html:111
 #: templates/papiro/services.html:57
 msgid "description"
 msgstr "descrição"
@@ -71,7 +71,7 @@ msgstr "método"
 
 #: descriptor/models.py:40
 msgid "tag"
-msgstr ""
+msgstr "versão"
 
 #: descriptor/models.py:46
 msgid "service"
@@ -81,80 +81,72 @@ msgstr "serviço"
 msgid "services"
 msgstr "serviços"
 
-#: descriptor/models.py:52
+#: descriptor/models.py:53
 msgid "request"
 msgstr "requisição"
 
-#: descriptor/models.py:53
-#, fuzzy
-#| msgid "response"
+#: descriptor/models.py:54
 msgid "response 200 - ok"
 msgstr "resposta 200 - ok"
 
-#: descriptor/models.py:54
+#: descriptor/models.py:55
 msgid "response 400 - error"
 msgstr "resposta 400 - erro"
 
-#: descriptor/models.py:55
+#: descriptor/models.py:56
 msgid "response 403 - forbidden"
 msgstr "resposta 403 - não permitido"
 
-#: descriptor/models.py:56
+#: descriptor/models.py:57
 msgid "response 500 - server error"
 msgstr "resposta 500 - erro de servidor"
 
-#: descriptor/models.py:59
-#, fuzzy
-#| msgid "parameter"
+#: descriptor/models.py:60
 msgid "parameter type"
-msgstr "parâmetro"
+msgstr "tipo de parâmetro"
 
-#: descriptor/models.py:67
-#, fuzzy
-#| msgid "parameter"
+#: descriptor/models.py:68
 msgid "parameter group"
 msgstr "grupo de parâmetros"
 
-#: descriptor/models.py:68
-#, fuzzy
-#| msgid "parameter"
+#: descriptor/models.py:69
 msgid "parameter groups"
 msgstr "grupo de parâmetros"
 
-#: descriptor/models.py:73
+#: descriptor/models.py:74
 msgid "alphanumeric"
 msgstr "alfanumérico"
 
-#: descriptor/models.py:74
+#: descriptor/models.py:75
 msgid "number"
 msgstr "número"
 
-#: descriptor/models.py:75
+#: descriptor/models.py:76
 msgid "array"
 msgstr "array"
 
-#: descriptor/models.py:76
+#: descriptor/models.py:77
 msgid "object"
-msgstr ""
+msgstr "objeto"
 
-#: descriptor/models.py:80 templates/papiro/service_detail.html:215
+#: descriptor/models.py:81 templates/papiro/service_detail.html:169
 msgid "format"
 msgstr "formato"
 
-#: descriptor/models.py:81 templates/papiro/service_detail.html:219
+#: descriptor/models.py:82 templates/papiro/service_detail.html:173
 msgid "size"
 msgstr "tamanho"
 
-#: descriptor/models.py:82 templates/papiro/service_detail.html:223
+#: descriptor/models.py:83 templates/papiro/service_detail.html:177
 msgid "required"
 msgstr "obrigatório"
 
-#: descriptor/models.py:83 templates/papiro/service_detail.html:227
+#: descriptor/models.py:84 templates/papiro/service_detail.html:181
 msgid "domain rules"
 msgstr "regras de domínio"
 
-#: descriptor/models.py:90 descriptor/models.py:91 descriptor/models.py:111
-#: descriptor/models.py:112
+#: descriptor/models.py:91 descriptor/models.py:92 descriptor/models.py:112
+#: descriptor/models.py:113 templates/papiro/service_detail.html:211
 msgid "parameter"
 msgstr "parâmetro"
 
@@ -166,36 +158,40 @@ msgstr "Inglês"
 msgid "Portuguese"
 msgstr "Português"
 
-#: templates/papiro/base.html:6 templates/papiro/base.html:40
+#: templates/papiro/base copy.html:6 copy.html:41 templates/papiro/index.html:6
 msgid "API Administration"
 msgstr "Administração de API's"
 
-#: templates/papiro/base.html:43
+#: templates/papiro/base copy.html:45 templates/papiro/index.html:83
 msgid "Welcome"
 msgstr "Bem Vindo(a)"
 
-#: templates/papiro/base.html:43
+#: templates/papiro/base copy.html:45 templates/papiro/index.html:83
 msgid "Logout"
 msgstr "Encerrar Sessão"
 
-#: templates/papiro/index.html:4 templates/papiro/index.html:35
-#: templates/papiro/services.html:33
+#: templates/papiro/frame_listing.html:4 templates/papiro/index copy.html:4
+#: copy.html:35 templates/papiro/services.html:33
 msgid "API Projects"
 msgstr "Projetos de API"
 
-#: templates/papiro/index.html:35 templates/papiro/services.html:33
+#: templates/papiro/index copy.html:35 templates/papiro/services.html:33
 msgid "Home"
 msgstr "Início"
 
-#: templates/papiro/index.html:44
+#: templates/papiro/index copy.html:44
 msgid "New API Project"
 msgstr "Novo Projeto de API"
 
-#: templates/papiro/index.html:67
+#: templates/papiro/index copy.html:67 templates/papiro/index.html:108
 msgid "No API found"
 msgstr "Nenhuma API encontrada"
 
-#: templates/papiro/popup_new_api.html:5
+#: templates/papiro/index.html:92
+msgid "Projects"
+msgstr "Projetos"
+
+#: templates/papiro/index.html:103 templates/papiro/popup_new_api.html:5
 #: templates/papiro/popup_new_service.html:5 templates/papiro/services.html:39
 msgid "Add service"
 msgstr "Adicionar serviço"
@@ -211,7 +207,6 @@ msgid "Submit"
 msgstr "Salvar"
 
 #: templates/papiro/popup_new_parameter.html:5
-#: templates/papiro/service_detail.html:256
 msgid "Add parameter"
 msgstr "Adicionar parâmetro"
 
@@ -219,81 +214,80 @@ msgstr "Adicionar parâmetro"
 msgid "Add service to"
 msgstr "Adicionar serviço a"
 
-#: templates/papiro/service_detail.html:85
+#: templates/papiro/service_detail.html:52
 msgid "Are you sure you want close this version and generate a new tag?"
 msgstr "Tem certeza que gostaria de assinar e fechar essa versão?"
 
-#: templates/papiro/service_detail.html:125
+#: templates/papiro/service_detail.html:90
 msgid "pending"
-msgstr ""
+msgstr "pendente"
 
-#: templates/papiro/service_detail.html:133
+#: templates/papiro/service_detail.html:97
 msgid "Version"
 msgstr "Versão"
 
-#: templates/papiro/service_detail.html:139
+#: templates/papiro/service_detail.html:103
 msgid "Go"
 msgstr "Ir"
 
-#: templates/papiro/service_detail.html:155
-#, fuzzy
-#| msgid "description"
+#: templates/papiro/service_detail.html:115
 msgid "Click to add description"
 msgstr "Clique para adicionar descrição"
 
-#: templates/papiro/service_detail.html:164
+#: templates/papiro/service_detail.html:121
 msgid "status"
 msgstr "status"
 
-#: templates/papiro/service_detail.html:245
+#: templates/papiro/service_detail.html:141
+msgid "No endpoint"
+msgstr "uri do endpoint"
+
+#: templates/papiro/service_detail.html:199
 msgid "no parameters yet."
 msgstr "nenhuma parâmetro cadastrado."
 
-#: templates/papiro/service_detail.html:263
+#: templates/papiro/service_detail.html:219
 msgid "No parameter groups yet."
 msgstr "Nenhum grupo de parâmetro cadastrado ainda."
 
-#: templates/papiro/service_detail.html:271
-#: templates/papiro/service_detail.html:288
+#: templates/papiro/service_detail.html:227
+#: templates/papiro/service_detail.html:244
 msgid "First signature"
 msgstr "Primeira assinatura"
 
-#: templates/papiro/service_detail.html:273
-#, fuzzy
-#| msgid "Commit tag"
+#: templates/papiro/service_detail.html:229
 msgid "Sign and commit tag"
 msgstr "Assinar e fechar versão"
 
-#: templates/papiro/service_detail.html:277
-#: templates/papiro/service_detail.html:296
-#, fuzzy
-#| msgid "First signature"
+#: templates/papiro/service_detail.html:233
+#: templates/papiro/service_detail.html:252
 msgid "Second signature"
 msgstr "Segunda Assinatura"
 
-#: templates/papiro/service_detail.html:280
-#, fuzzy
-#| msgid "First signature"
+#: templates/papiro/service_detail.html:236
 msgid "Awaiting for first signature"
-msgstr "Aguardando pela primeira assinatura"
+msgstr "Aguardando a primeira assinatura"
 
-#: templates/papiro/service_detail.html:289
+#: templates/papiro/service_detail.html:245
 msgid "Digitally signed by"
 msgstr "Assinado digitalmente por"
 
-#: templates/papiro/service_detail.html:290
+#: templates/papiro/service_detail.html:246
 msgid " at "
 msgstr " em "
 
-#: templates/papiro/service_detail.html:298
-#, fuzzy
-#| msgid "Commit tag"
+#: templates/papiro/service_detail.html:254
 msgid "Confirm and commit tag"
 msgstr "Confirmar e fechar versão"
 
 #: templates/papiro/services.html:80
 msgid "No services found"
 msgstr "Nenhum serviço encontrado"
+
+#, fuzzy
+#~| msgid "parameter"
+#~ msgid "Parameter"
+#~ msgstr "Parâmetro"
 
 #~ msgid "Signed by"
 #~ msgstr "Assinado por"

@@ -1,0 +1,203 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
+    border: none;
+    color: #333;
+    background: #fff;
+}
+
+a:link, a:visited {
+    color: #447e9b;
+    text-decoration: none;
+}
+
+#header {
+    width: auto;
+    height: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px 15px;
+    background-color: #215897;
+    color: #ffc;
+    overflow: hidden;
+}
+
+#header h1 {
+    padding: 0;
+    margin: 0;
+    font-weight: 300;
+    font-size: 24px;
+}
+
+#user-tools {
+    float: right;
+    padding: 0;
+    margin: 0 0 0 20px;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: right;
+}
+
+#user-tools a {
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+#side_navigation {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 22%; /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 70px; /* Stay at the top */
+  left: 0;
+  overflow-x: hidden; /* Disable horizontal scroll */
+  border-right: 1px solid #ddd; 
+  letter-spacing: 0.03em;
+}
+
+#side_navigation h1 {
+    font-weight: 500;
+    font-size: 16px;
+    margin:0;
+    padding: 14px 20px 10px;
+    color: #215897;
+    background-color: #eee; 
+    border-bottom: 1px solid #CCC;
+}
+
+#side_navigation a {
+  text-decoration: none;
+  color: #333;
+  display: block;
+}
+
+#side_navigation span.desc {
+    font-size:10px;
+}
+
+#side_navigation span.empty {
+    font-size:12px;
+}
+
+#side_navigation a:hover {
+  color: #f1f1f1;
+}
+
+#side_navigation button.add {
+    font-size: 10px;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    background-color:#9ebae8;
+    padding: 5px 8px;
+    text-transform: uppercase;
+    margin:15px 0 5px 20px;
+}
+
+
+#accordion h3 {
+    font-weight: 400;
+    color:#333;
+    border-top: 1px solid #ddd;
+}
+
+#accordion h3:first-child {
+    border-top: none;
+}
+
+#accordion h3:last-child {
+    border-bottom: 1px solid #ddd;
+}
+
+#accordion h3.ui-accordion-header-active {
+    box-shadow: 1px 5px 6px #eee;
+}
+
+#accordion h3 span.services {
+    font-size:12px;
+    margin-top: 2px;
+    color:#888;
+    display: block;
+    float: right;
+}
+
+#accordion span {
+    margin-right: 5px;
+}
+
+#accordion a {
+    color: #777;
+    font-size:13px;
+    padding: 5px 0 5px 16px;
+}
+
+#accordion a:hover {
+    color: #777;
+    background-color: #eee;
+}
+
+#accordion a span.http-method{
+    font-size: 8px;
+    font-weight: 700;
+    display: inline-block;
+    width: 40px;
+    text-align: center;
+}
+
+#accordion a span.post {color:#feb60c;}
+#accordion a span.get {color: #46b775;}
+#accordion a span.put {color:#215897;}
+#accordion a span.patch {color:#163664;}
+#accordion a span.delete {color: #f00;}
+
+
+/* Style page content */
+#service_details {
+  margin-left: 22%; /* Same as the width of the sidebar */
+  padding: 0;
+  position: relative;
+}
+
+
+/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+    /*
+  #side_navigation {padding-top: 15px;}
+  #side_navigation a {font-size: 18px;}
+  */
+}
+
+
+/*
+JQuery UI overrides
+*/
+.ui-state-active {
+    background-color: #fff;
+    color: inherit;
+}
+.ui-state-default{border:0;background-color: #fff;}
+.ui-corner-all {
+    border-radius: 0;
+}
+
+.ui-state-active .ui-icon, .ui-button:active .ui-icon {
+    background-image: url('https://code.jquery.com/ui/1.12.1/themes/base/images/ui-icons_444444_256x240.png');
+}
+
+.ui-widget-content {
+    border: none;
+}
+
+.ui-accordion .ui-accordion-header {
+    margin:0;
+}
+
+.ui-accordion .ui-accordion-content {
+    padding:10px 0;
+}

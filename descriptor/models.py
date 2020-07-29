@@ -28,7 +28,7 @@ class Service(models.Model):
         ('PATCH', 'PATCH'),
     ]
 
-    api = models.ForeignKey(Api, on_delete=models.CASCADE)
+    api = models.ForeignKey(Api, on_delete=models.CASCADE, related_name='services')
     name = models.CharField(_('name'), max_length=120)
     description = models.TextField(_('description'), blank=True, default="")
     status = models.CharField(max_length=2, choices=SERVICE_STATUS, blank=False, null=False)
@@ -45,6 +45,7 @@ class Service(models.Model):
     class Meta:
         verbose_name = _('service')
         verbose_name_plural = _('services')
+        ordering = ['name']
 
 
 class ParameterGroup(models.Model):

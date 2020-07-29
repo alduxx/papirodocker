@@ -1,181 +1,98 @@
 {% extends "papiro/base.html" %}
+{% load static %}
 {% load i18n %}
 
-{% block css_internal %}
-    #content h1 em {font-size:0.66em;}
-    #content h1 .status {font-size:0.66em;color:red;}
-
-    #id_description {
-        font-size:16px;
-    }
-
-    #id_iib {
-        display:inline-block;
-        font-size:12px;
-        color:#999;
-        padding: 20px 0;
-    }
-
-    #id_endpoint {
-        display:inline-block;
-        color:#215897;
-        padding: 10px 0 20px;
-        font-size:13px;
-    }
-
-    span.http_method {
-        display:inline-block;
-        padding:5px 8px 4px;
-        font-weight: 600;
-        font-size: 12px;
-        border: 2px solid #3da066;
-        border-radius: 4px;
-        color: #3da066;
-    }
-
-    button.go { font-size: 13px; border: 1px solid #ccc; border-radius: 4px; background: #fff; box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
-        cursor: pointer; height: 28px; line-height: 1; padding: 6px 8px; margin: 0; color: #333;}
-
-    .tag_control {background-color: #eee;padding:8px 20px 20px;}
-
-    .tag_signature {
-        display:inline-block;
-        width: 350px;
-        margin-right:20px;
-        vertical-align: top;
-    }
-
-    .tag_signature > div {
-        text-align:center;
-        padding:20px 10px;
-        border: 1px solid #ccc; border-radius: 4px;
-        font-size:15px;
-        font-family: 'VT323', monospace;
-        min-height: 40px;
-    }
-    .tag_signature > div:before {
-        content: '';
-        display: inline-block;
-        vertical-align: middle;
-        height: 100%;
-    }
-
-    .tag_signature > div > span {
-        font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
-    }
-
-    .tag_control button {border: none;border-radius: 4px;color: #fff; cursor: pointer;background: #205067;
-        text-transform: uppercase;padding: 12px 15px;}
-
+{% block header_insert %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/service-details.css' %}?09qejuuuuw31ad9">
+    <script src="{% static 'js/popup.js' %}"></script>
 {% endblock %}
 
 {% block jquery_internal %}
-    var popupWindow;
-    function isPopupWindowOpen(){
-        if(popupWindow){
-            if(popupWindow.closed) return false;
-            return true;
-        } else
-            return false;
-    }
-
-    $ = django.jQuery;
-    $(function() {
-        $('a.jpopup').click(function() {
-            if(!isPopupWindowOpen()){
-                var href = django.jQuery(this).attr('href');
-                popupWindow = window.open(href, 'jpopup', 'height=600, width=500, toolbar=no');
-            } else {
-                popupWindow.focus();
-            }
-            return false;
-        });
-
-        $("#change_service_version").click(function(){
-            var tag = $("#service_tags").val();
-            if(tag==0){
-                document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}";
-            } else {
-                document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}/tag/" + tag;
-            }
-        });
-
-        function csrfSafeMethod(method) {
-            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    $("#change_service_version").click(function(){
+        var tag = $("#service_tags").val();
+        if(tag==0){
+            document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}";
+        } else {
+            document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}/tag/" + tag;
         }
-        $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
-                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                    xhr.setRequestHeader("X-CSRFToken", $("#_csrf").val());
+    });
+
+    function csrfSafeMethod(method) {
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", $("#_csrf").val());
+            }
+        }
+    });
+
+    $("#commit_tag").click(function(){
+        if(confirm("{% trans 'Are you sure you want close this version and generate a new tag?'%}")){
+            var _url = "{% url 'create_new_tag' service.id %}";
+            var _data = '{"commit": "true" }';
+            var returned_version;
+            console.log(_url);
+            console.log(_data);
+            $.ajax({
+                url : _url,
+                type : 'POST',
+                data : _data,
+                headers : {
+                    'Content-Type' : 'application/json'
+                },
+                success : function(response, textStatus, jqXhr) {
+                    console.log("Successfully Posted!", textStatus);
+                    returned_version = response;
+                    console.log(returned_version);
+                },
+                error : function(jqXHR, textStatus, errorThrown) {
+                    console.log("The following error occured: " + textStatus, errorThrown);
+                },
+                complete : function() {
+                    document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}/tag/" + returned_version;
                 }
-            }
-        });
-
-        $("#commit_tag").click(function(){
-            if(confirm("{% trans 'Are you sure you want close this version and generate a new tag?'%}")){
-                var _url = "{% url 'create_new_tag' service.id %}";
-                var _data = '{"commit": "true" }';
-                var returned_version;
-                console.log(_url);
-                console.log(_data);
-                $.ajax({
-                    url : _url,
-                    type : 'POST',
-                    data : _data,
-                    headers : {
-                        'Content-Type' : 'application/json'
-                    },
-                    success : function(response, textStatus, jqXhr) {
-                        console.log("Successfully Posted!", textStatus);
-                        returned_version = response;
-                        console.log(returned_version);
-                    },
-                    error : function(jqXHR, textStatus, errorThrown) {
-                        console.log("The following error occured: " + textStatus, errorThrown);
-                    },
-                    complete : function() {
-                        document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}/tag/" + returned_version;
-                    }
-                });
-            }
-        });
-
+            });
+        }
     });
 {% endblock %}
 
-{% block breadcrumbs %}
-    <a href="/api/">Início</a> &rsaquo; <a href="/api/">Projetos de API's</a> &rsaquo; <a href="/api/{{service.api.id}}/services"> {{ service.api.name }}</a> &rsaquo; {{ service.name }}
-{% endblock %}
-
-{% block title %}
-    <span class="http_method {{service.http_method}}">{{service.http_method}}</span>
-    <strong>{{ service.name }} </strong>
-    <em>[{% if service.tag == 0 %}SNAPSHOT{% else %}v. {{service.tag}}{% endif %}]</em>
-    {% if tag_signature %}
-        {% if tag_signature.is_closed == False %}
-            <span class="status"> {% trans 'pending' %}</span>
+{% block main %}
+<div id="title">
+    <div>
+        <h1>{{ service.name }} </h1>
+        <em>[{% if service.tag == 0 %}SNAPSHOT{% else %}v. {{service.tag}}{% endif %}]</em>
+        {% if tag_signature %}
+            {% if tag_signature.is_closed == False %}
+                <span class="status"> {% trans 'pending' %}</span>
+            {% endif %}
         {% endif %}
-    {% endif %}
- {% endblock %}
+    </div>
 
-{% block content_main %}
-<ul class="object-tools">
-    <li>
-        {% trans 'Version' %}: 
-        <select id="service_tags">
-            {% for svc in all_services %}
-                <option value="{{svc.tag}}" {% if svc.tag == service.tag %}selected{% endif %}>{% if svc.tag == 0 %}SNAPSHOT{% else %}{{svc.tag}}{% endif %}</option>
-            {% endfor %}
-        </select>
-        <button type="button" id="change_service_version" class="go">{% trans "Go" %}</button>
-    </li>
-</ul>
+    <ul id="tag-select">
+        <li>
+            {% trans 'Version' %}: 
+            <select id="service_tags">
+                {% for svc in all_services %}
+                    <option value="{{svc.tag}}" {% if svc.tag == service.tag %}selected{% endif %}>{% if svc.tag == 0 %}SNAPSHOT{% else %}{{svc.tag}}{% endif %}</option>
+                {% endfor %}
+            </select>
+            <button type="button" id="change_service_version" class="go">{% trans "Go" %}</button>
+        </li>
+    </ul>
+</div>
 
-<form id="service_form" novalidate="">
+
+<form id="service_form" novalidate="" style="display: none;">
     <input type="hidden" id="_csrf" value="{{csrf_token}}">
+</form>
+
+
+<div id="service_attributes">
     <div>
         <div>
-            <span name="description" id="id_description" class="editable" data-field-type="textarea" data-field="description" data-field-label="{% trans 'description' %}" data-id="{{service.id}}">
+            <span name="description" id="description" class="editable" data-field-type="textarea" data-field="description" data-field-label="{% trans 'description' %}" data-id="{{service.id}}">
                 {% if service.description %}
                     {{ service.description }}
                 {% else %}
@@ -192,7 +109,7 @@
         -->
         <div>    
             {% if service.iib_service_number %}
-                <span name="iib" id="id_iib">
+                <span name="iib" id="iib">
                     {{ service.iib_service_number }}
                     {% if service.iib_service_number %}
                             v.{{ service.iib_service_version_number }}
@@ -200,83 +117,86 @@
                 </span>
             {% endif %}
         </div>
-        <div>
-            <span name="endpoint" id="id_endpoint">
-                {% if service.endpoint_uri %}
-                    {{ service.endpoint_uri }}
-                {% else %}
-                    {% trans 'No endpoint' %}
-                {% endif %}
+        <div id="endpoint">
+                <span class="http_method {{service.http_method|lower}}">
+                    {{service.http_method}}
+                </span>
+                <span class="url">
+                    {% if service.endpoint_uri %}
+                        {{ service.endpoint_uri }}
+                    {% else %}
+                        {% trans 'No endpoint' %}
+                    {% endif %}
+                </span>
             </span>
         </div>
     </div>
-</form>
-<div>
-    <div class="clear" style="height:40px;"></div>
-    <h1>{% trans 'Parameters' %}</h1>
+</div>
+
 {% if parameter_groups %}
     {% for parameter_group in parameter_groups %}
-    <div class="form-row" id="group_{{parameter_group.id}}">
-        <div class="module" id="changelist">
-            <div class="results">
-                <table id="result_list">
-                    <caption>
-                        <a href="/admin/descriptor/" class="section" title="API's">{{ parameter_group.get_type_display }}</a>
-                    </caption>
-                    {% if parameter_group.parameters.all %}
-                    <thead>
-                        <tr>
-                            <th scope="col"  class="action-checkbox-column">
-                               <div class="text"></div>
-                               <div class="clear"></div>
-                            </th>
-                            <th scope="col"  class="column-name">
-                               <div class="text">{% trans "name" %}</div>
-                               <div class="clear"></div>
-                            </th>
-                            <th scope="col"  class="column-description">
-                               <div class="text">{% trans "format" %}</div>
-                               <div class="clear"></div>
-                            </th>
-                            <th scope="col"  class="column-size">
-                               <div class="text">{% trans "size" %}</div>
-                               <div class="clear"></div>
-                            </th>
-                            <th scope="col"  class="column-required">
-                               <div class="text">{% trans "required" %}</div>
-                               <div class="clear"></div>
-                            </th>
-                            <th scope="col"  class="column-domain_rules">
-                               <div class="text">{% trans "domain rules" %}</div>
-                               <div class="clear"></div>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for parameter in parameter_group.parameters.all %}
-                            <tr class="row1">
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ parameter.name }}</td>
-                                <td >{{ parameter.get_format_display }}</td>
-                                <td >{{ parameter.size }}</td>
-                                <td >{{ parameter.required|yesno:"Sim,Não,Não" }}</td>
-                                <td >{{ parameter.domain_rules }}</td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
+    <div class="parameter-group" id="group_{{parameter_group.id}}">
+        <div class="results">
+            <table id="result_list">
+                <caption class="{% if parameter_group.type == '088800'%}{{service.http_method|lower}}{% endif %}">
+                    {{ parameter_group.get_type_display }}
+                </caption>
+                {% if parameter_group.parameters.all %}
+                <thead>
+                    <tr>
+                        <th scope="col"  class="action-checkbox-column">
+                            <div class="text"></div>
+                            <div class="clear"></div>
+                        </th>
+                        <th scope="col"  class="column-name">
+                            <div class="text">{% trans "name" %}</div>
+                            <div class="clear"></div>
+                        </th>
+                        <th scope="col"  class="column-description">
+                            <div class="text">{% trans "format" %}</div>
+                            <div class="clear"></div>
+                        </th>
+                        <th scope="col"  class="column-size">
+                            <div class="text">{% trans "size" %}</div>
+                            <div class="clear"></div>
+                        </th>
+                        <th scope="col"  class="column-required">
+                            <div class="text">{% trans "required" %}</div>
+                            <div class="clear"></div>
+                        </th>
+                        <th scope="col"  class="column-domain_rules">
+                            <div class="text">{% trans "domain rules" %}</div>
+                            <div class="clear"></div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for parameter in parameter_group.parameters.all %}
                         <tr class="row1">
-                            <td colspan="4">{% trans "no parameters yet." %}</td>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ parameter.name }}</td>
+                            <td >{{ parameter.get_format_display }}</td>
+                            <td >{{ parameter.size }}</td>
+                            <td >{{ parameter.required|yesno:"Sim,Não,Não" }}</td>
+                            <td >{{ parameter.domain_rules }}</td>
                         </tr>
-                    {% endif %}
-                    </tbody>
-                </table>
-            </div>
+                    {% endfor %}
+                {% else %}
+                    <tr class="row1">
+                        <td colspan="4">{% trans "no parameters yet." %}</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
         </div>
-        <ul class="object-tools">
+        <ul class="parameter-action">
             <li>
                 {% if service.tag == 0 %}
                 <!-- editable only if service tag is SNAPSHOT (0) -->
-                <a href="{% url 'popup_add_parameter' service.id parameter_group.id %}" class="addlink jpopup">{% trans "Add parameter" %}</a>
+                <button type="button" data-href="{% url 'popup_add_parameter' service.id parameter_group.id %}" class="add jpopup">
+                    <span class="ui-icon ui-icon-plusthick"></span>
+                    {% trans "parameter" %}
+                </button>
                 {% endif %}
             </li>
         </ul>
@@ -288,42 +208,42 @@
 </div>
 
 <div class="tag_control">
-    {% if service.tag == 0 %}
-        <!-- only shows button if tag == 0 (SNAPSHOT) -->
-            <div class="tag_signature">
-                <h3>{% trans 'First signature' %}</h3>
-                <div>
-                    <button id="commit_tag">{% trans 'Sign and commit tag' %}</button>
-                </div>
+{% if service.tag == 0 %}
+    <!-- only shows button if tag == 0 (SNAPSHOT) -->
+        <div class="tag_signature">
+            <h3>{% trans 'First signature' %}</h3>
+            <div>
+                <button id="commit_tag">{% trans 'Sign and commit tag' %}</button>
             </div>
-            <div class="tag_signature">
-                <h3>{% trans 'Second signature' %}</h3>
-                <div>
-                    <span>
-                        {% trans 'Awaiting for first signature' %}
-                    </span>
-                </div>
+        </div>
+        <div class="tag_signature">
+            <h3>{% trans 'Second signature' %}</h3>
+            <div>
+                <span>
+                    {% trans 'Awaiting for first signature' %}
+                </span>
             </div>
-    {% else %}
-        <!-- if not snapshot -->
-        {% if tag_signature %}
-            <div class="tag_signature">
-                <h3>{% trans 'First signature' %}</h3>
-                <div>{% trans 'Digitally signed by' %} {{tag_signature.first_signer.first_name}} {{tag_signature.first_signer.last_name}}
-                    {% trans ' at ' %} {{tag_signature.signed_at}}
-                </div>
+        </div>
+{% else %}
+    <!-- if not snapshot -->
+    {% if tag_signature %}
+        <div class="tag_signature">
+            <h3>{% trans 'First signature' %}</h3>
+            <div>{% trans 'Digitally signed by' %} {{tag_signature.first_signer.first_name}} {{tag_signature.first_signer.last_name}}
+                {% trans ' at ' %} {{tag_signature.signed_at}}
             </div>
+        </div>
 
-            {% if tag_signature.second_signer == None %}
-            <div class="tag_signature">
-                <h3>{% trans 'Second signature' %}</h3>
-                <div>
-                    <button id="confirm_tag">{% trans 'Confirm and commit tag' %}</button>
-                </div>
+        {% if tag_signature.second_signer == None %}
+        <div class="tag_signature">
+            <h3>{% trans 'Second signature' %}</h3>
+            <div>
+                <button id="confirm_tag">{% trans 'Confirm and commit tag' %}</button>
             </div>
-            {% endif %}
+        </div>
         {% endif %}
     {% endif %}
-    <div class="clear"></div>
-</div>
+{% endif %}
+<div class="clear"></div>
+
 {% endblock %}

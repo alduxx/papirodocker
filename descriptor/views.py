@@ -1,15 +1,15 @@
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
 
-from .models import Api, Service, Parameter, ParameterGroup, TagSignature
 from .forms import ParameterForm, ServiceForm, ApiForm
+from .models import Api, Service, Parameter, ParameterGroup, TagSignature
 
-SNAPSHOT = 0
+SNAPSHOT = 0 # const
 
-@login_required
+#@login_required
 def index(request):
     """
     View for index page where it lists all api projects
@@ -42,10 +42,14 @@ def service_detail_by_name_and_tag(request, api_id, service_name, tag):
     """
     Render service detail by api_id and service name and tag
     """
+
+    api = Api.objects.get(pk=api_id)
+
     all_services_with_name = Service.objects.filter(name=service_name).order_by('tag')
 
     # get working service with tag 0 (not a closed service)
-    service = Service.objects.get(name=service_name, tag=tag)
+    service = Service.objects.get(api=api, name=service_name, tag=tag)
+
     parameter_groups = ParameterGroup.objects.filter(service=service).order_by('type')
 
     # try to find tag signature, otherwise returns none
@@ -159,3 +163,9 @@ def force_auth(request, username):
     login(request, user)
     # return index(request)
     return redirect('/api/')
+
+
+
+def detail_service(request):
+        context = {}
+        return render(request, 'papiro/frame_listing.html', context)

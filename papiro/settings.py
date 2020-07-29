@@ -31,6 +31,8 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
 ]
 
+X_FRAME_OPTIONS = 'ALLOWALL'
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
