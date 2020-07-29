@@ -13,7 +13,7 @@
         if(tag==0){
             document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}";
         } else {
-            document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}/tag/" + tag;
+            document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}tag/" + tag;
         }
     });
 
@@ -168,21 +168,28 @@
                             <div class="text">{% trans "domain rules" %}</div>
                             <div class="clear"></div>
                         </th>
+                        <th scope="col"  class="add">
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for parameter in parameter_group.parameters.all %}
-                        <tr class="row1">
+                        <tr>
                             <td>{{ forloop.counter }}</td>
                             <td>{{ parameter.name }}</td>
-                            <td >{{ parameter.get_format_display }}</td>
-                            <td >{{ parameter.size }}</td>
-                            <td >{{ parameter.required|yesno:"Sim,Não,Não" }}</td>
-                            <td >{{ parameter.domain_rules }}</td>
+                            <td>{{ parameter.get_format_display }}</td>
+                            <td>{{ parameter.size }}</td>
+                            <td>{{ parameter.required|yesno:"Sim,Não,Não" }}</td>
+                            <td>{{ parameter.domain_rules }}</td>
+                            <td>
+                                {% if parameter.format == 'AR' %}
+                                    <button type="button">Add</button>
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                 {% else %}
-                    <tr class="row1">
+                    <tr>
                         <td colspan="4">{% trans "no parameters yet." %}</td>
                     </tr>
                 {% endif %}

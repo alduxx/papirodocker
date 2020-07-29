@@ -83,7 +83,9 @@
                             <h3>{{ api.name }} <span class="services">{{api.services.count}} serviço{{ api.services.count|pluralize:",s" }}</span></h3>
                             <div>
                                 {% for service in api.services.all %} 
-                                    <a href="/api/{{api.id}}/service/{{service.name}}/" class="open-in-iframe"><span class="http-method {{service.http_method|lower}}">{{service.http_method}}</span>{{service.name}}</a>
+                                    {% if service.is_snapshot %}
+                                        <a href="/api/{{api.id}}/service/{{service.name}}/" class="open-in-iframe"><span class="http-method {{service.http_method|lower}}">{{service.http_method}}</span>{{service.name}}</a>
+                                    {% endif %}
                                 {% endfor %}
 
                                 <button type="button" data-href="{% url 'popup_add_service' api.id %}" class="add jpopup">

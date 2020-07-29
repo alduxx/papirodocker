@@ -47,6 +47,9 @@ class Service(models.Model):
         verbose_name_plural = _('services')
         ordering = ['name']
 
+    def is_snapshot(self):
+        return self.tag == 0
+
 
 class ParameterGroup(models.Model):
     PARAMETER_GROUP_TYPE = [
