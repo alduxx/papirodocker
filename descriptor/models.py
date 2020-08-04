@@ -61,11 +61,10 @@ class ParameterGroup(models.Model):
     ]
 
     type = models.CharField(_('parameter type'), max_length=3, blank=False, null=False, choices=PARAMETER_GROUP_TYPE)
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='parameter_groups')
 
     def __str__(self):
-        #return f"{self.service.name} - {self.get_type_display()}"
-        return self.service.name + "-" + self.get_type_display()
+        return f"{self.service.name} - {self.get_type_display()}"
 
     class Meta:
         verbose_name = _('parameter group')
@@ -85,6 +84,7 @@ class Parameter(models.Model):
     size = models.CharField(_('size'), max_length=20)
     required = models.BooleanField(_('required'), default=True)
     domain_rules = models.CharField(_('domain rules'), max_length=120, blank=True, default="")
+    parameter_parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='parameter_children', blank=True, null=True)
     parameter_group = models.ForeignKey(ParameterGroup, on_delete=models.CASCADE, related_name='parameters')
 
     def __str__(self):
@@ -96,20 +96,20 @@ class Parameter(models.Model):
 
 
 class TagSignature(models.Model):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='tag_signatures')
     first_signer = models.ForeignKey(User, related_name='First_signer', on_delete=models.CASCADE, null=False)
     second_signer = models.ForeignKey(User, related_name='Second_signer', on_delete=models.CASCADE, null=True, default=None)
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    signed_at = models.DateTimeField(auto_now_add=True)
+    first_signature_signed_at = models.DateTimeField(null=True)
+    second_signature_signed_at = models.DateTimeField(null=True)
 
     def is_closed(self):
         return (self.first_signer is not None) and (self.second_signer is not None)
 
     def __str__(self):
         if self.first_signer and self.second_signer:
-            return f"{_('Signed by')} {self.first_signer.username}  {_(' and ')} {self.second_signer.username} + \
-                   {_(' at ')} {self.signed_at}"
+            return f"{_('Signed by')} {self.first_signer.username}  {_(' and ')} {self.second_signer.username}" 
         else:
-            return f"{_('Signed by')} {self.first_signer.username} {_(' at ')} {self.signed_at}"
+            return f"{_('Signed by')} {self.first_signer.username}"
 
     class Meta:
         verbose_name = _('parameter')

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Api, Service, Parameter, ParameterGroup
+from .models import Api, Service, Parameter, ParameterGroup, TagSignature
 
 class ParameterGroupTabularInline(admin.TabularInline):
     model = ParameterGroup
@@ -15,14 +15,17 @@ class ServiceAdmin(admin.ModelAdmin):
 class ParameterTabularInline(admin.TabularInline):
     model = Parameter
 
+"""
 @admin.register(ParameterGroup)
 class ParameterGroupAdmin(admin.ModelAdmin):
     inlines = [ParameterTabularInline]
     #list_display = ('name', 'description', 'http_method')
     class Meta:
         model = ParameterGroup
+    """
 
 admin.site.register(Api)
 # admin.site.register(Service, ServiceAdmin)
-#admin.site.register(ParameterGroup)
+admin.site.register(ParameterGroup)
 admin.site.register(Parameter)
+admin.site.register(TagSignature)

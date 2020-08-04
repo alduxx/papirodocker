@@ -9,8 +9,7 @@ class ApiForm(ModelForm):
 class ParameterForm(ModelForm):
      class Meta:
          model = Parameter
-         fields = ['name', 'format', 'size', 'required', 'domain_rules',
-                   'parameter_group']
+         fields = ['name', 'format', 'size', 'required', 'domain_rules', 'parameter_group', 'parameter_parent']
 
 class ServiceForm(ModelForm):
      class Meta:

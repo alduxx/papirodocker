@@ -1,8 +1,12 @@
+import itertools
+import pytz
+
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.utils import timezone
 
 from .forms import ParameterForm, ServiceForm, ApiForm
 from .models import Api, Service, Parameter, ParameterGroup, TagSignature
@@ -45,12 +49,10 @@ def service_detail_by_name_and_tag(request, api_id, service_name, tag):
 
     api = Api.objects.get(pk=api_id)
 
-    all_services_with_name = Service.objects.filter(name=service_name).order_by('tag')
+    all_services_with_name = Service.objects.filter(api=api, name=service_name).order_by('tag')
 
     # get working service with tag 0 (not a closed service)
     service = Service.objects.get(api=api, name=service_name, tag=tag)
-
-    parameter_groups = ParameterGroup.objects.filter(service=service).order_by('type')
 
     # try to find tag signature, otherwise returns none
     tag_signature = None
@@ -58,15 +60,25 @@ def service_detail_by_name_and_tag(request, api_id, service_name, tag):
         tag_signature = TagSignature.objects.get(service=service)
     except TagSignature.DoesNotExist:
         pass
+    
+    # Checks if there is a pending tag for any version of that service
+    pending_tag = None
+    for _service in all_services_with_name:
+        for _tag in _service.tag_signatures.all():
+            if not _tag.is_closed() and _service.tag != SNAPSHOT:
+                pending_tag = _tag
+                break
+
+    custom_counter = TemplateIterator()
 
     # pass all_services_with_name to create dropdown with tags
     context = {'service': service,
                'all_services': all_services_with_name,
-               'parameter_groups': parameter_groups,
-               'tag_signature': tag_signature}
+               'mycounter': custom_counter,
+               'tag_signature': tag_signature,
+               'pending_tag': pending_tag}
 
-
-    return render(request, 'papiro/service_detail.html', context)
+    return render(request, 'papiro/service_details.html', context)
 
 
 def create_new_tag(request, service_id):
@@ -96,7 +108,25 @@ def create_new_tag(request, service_id):
                 param.parameter_group = pgroup
                 param.save()
 
-        tag_signature = TagSignature(first_signer=request.user, service=service)
+        tag_signature = TagSignature(service=service,
+                                     first_signer=request.user, 
+                                     first_signature_signed_at=timezone.now())
+        tag_signature.save()
+
+        return HttpResponse(service.tag)
+    else:
+        return HttpResponse('error')
+
+def confirm_new_tag(request, service_id):
+    """
+    Confirms new tag from SNAPSHOT version
+    Second signature
+    """
+    if request.method == "POST":
+        service = Service.objects.get(pk=service_id)
+        tag_signature = TagSignature.objects.get(service=service)
+        tag_signature.second_signer = request.user
+        tag_signature.second_signature_signed_at = timezone.now()
         tag_signature.save()
 
         return HttpResponse(service.tag)
@@ -104,7 +134,7 @@ def create_new_tag(request, service_id):
         return HttpResponse('error')
 
 
-def popup_add_parameter(request, service_id, parameter_group_id):
+def popup_add_parameter_with_parent(request, service_id, parameter_group_id, parent_id):
     if request.method == "POST":
         form = ParameterForm(request.POST)
         if form.is_valid():
@@ -115,9 +145,13 @@ def popup_add_parameter(request, service_id, parameter_group_id):
         form = ParameterForm()
 
         service = Service.objects.get(pk=service_id)
-        parameter_group = ParameterGroup.objects.get(pk=parameter_group_id)
-        context = {'service': service, 'parameter_group': parameter_group, 'form': form}
+
+        context = {'service': service, 'parameter_group_id': parameter_group_id, 'parent_id': parent_id, 'form': form}
         return render(request, 'papiro/popup_new_parameter.html', context)
+
+
+def popup_add_parameter(request, service_id, parameter_group_id):
+    return popup_add_parameter_with_parent(request, service_id, parameter_group_id, None)
 
 
 def popup_add_service(request, api_id):
@@ -165,7 +199,10 @@ def force_auth(request, username):
     return redirect('/api/')
 
 
-
-def detail_service(request):
-        context = {}
-        return render(request, 'papiro/frame_listing.html', context)
+class TemplateIterator(itertools.count):
+    """
+    Used to create custom loop counter.
+    See function service_detail_by_name_and_tag.
+    """
+    def next(self):
+        return next(self)

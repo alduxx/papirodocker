@@ -23,6 +23,14 @@ table {
     width: 100%;
 }
 
+tr.level1 td {
+    padding-left: 20px;
+}
+
+tr:hover td {
+    background-color:#ddf;
+}
+
 th {
     white-space: nowrap;
     vertical-align: middle;
@@ -122,12 +130,11 @@ tr:nth-child(even) {
     display: none;
 }
 
-#title span.status {
-    color:#f55;
-    font-size:0.66em;
-    position: absolute;
-    top: 52px;
-    left: 20px; 
+#pending_message {
+    padding:15px 20px;
+    background-color: #Fdd;
+    color:#F33;
+    font-size: 13px;
 }
 
 #description {
@@ -249,7 +256,7 @@ button.go {
     margin: 0;
 }
 
-.parameter-action button {
+.parameter-action button, .parameter_add {
     font-size: 10px;
     border: none;
     border-radius: 4px;

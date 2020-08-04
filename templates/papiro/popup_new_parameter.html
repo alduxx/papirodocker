@@ -26,8 +26,15 @@
     <script type="text/javascript">
         var $ = django.jQuery;
         $("document").ready(function(){
-            $("#id_parameter_group").val({{parameter_group.id}});
+            $("#id_parameter_group").val({{parameter_group_id}});
             $("#id_parameter_group").parent().parent().hide();
+
+            $("#id_parameter_parent").parent().parent().hide();
+
+            var parent_id = "{{parent_id}}";
+            if(parent_id.length && parent_id != "None"){
+                $("#id_parameter_parent").val(parent_id);
+            }
         });
     </script>
 </head>

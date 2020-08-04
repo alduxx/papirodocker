@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block header_insert %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/service-details.css' %}?09qejuuuuw31ad9">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/service-details.css' %}?0eju9skjç87087suuw31ad9">
     <script src="{% static 'js/popup.js' %}"></script>
 {% endblock %}
 
@@ -33,6 +33,33 @@
             var _url = "{% url 'create_new_tag' service.id %}";
             var _data = '{"commit": "true" }';
             var returned_version;
+            $.ajax({
+                url : _url,
+                type : 'POST',
+                data : _data,
+                headers : {
+                    'Content-Type' : 'application/json'
+                },
+                success : function(response, textStatus, jqXhr) {
+                    console.log("Successfully Posted!", textStatus);
+                    returned_version = response;
+                    console.log(returned_version);
+                },
+                error : function(jqXHR, textStatus, errorThrown) {
+                    console.log("The following error occured: " + textStatus, errorThrown);
+                },
+                complete : function() {
+                    document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}tag/" + returned_version;
+                }
+            });
+        }
+    });
+
+    $("#confirm_tag").click(function(){
+        if(confirm("{% trans 'Are you sure you want close this version and generate a new tag?'%}")){
+            var _url = "{% url 'confirm_new_tag' service.id %}";
+            var _data = '{"confirm": "true" }';
+            var returned_version;
             console.log(_url);
             console.log(_data);
             $.ajax({
@@ -51,7 +78,7 @@
                     console.log("The following error occured: " + textStatus, errorThrown);
                 },
                 complete : function() {
-                    document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}/tag/" + returned_version;
+                    document.location.href = "{% url 'service_detail_by_name' service.api.id service.name %}tag/" + returned_version;
                 }
             });
         }
@@ -63,11 +90,6 @@
     <div>
         <h1>{{ service.name }} </h1>
         <em>[{% if service.tag == 0 %}SNAPSHOT{% else %}v. {{service.tag}}{% endif %}]</em>
-        {% if tag_signature %}
-            {% if tag_signature.is_closed == False %}
-                <span class="status"> {% trans 'pending' %}</span>
-            {% endif %}
-        {% endif %}
     </div>
 
     <ul id="tag-select">
@@ -83,6 +105,16 @@
     </ul>
 </div>
 
+{% if pending_tag %}
+    <div id="pending_message">
+        {% if pending_tag.service == service %}
+            {%trans 'This version is pending second signature' %} 
+        {% else %}
+            <a href="{% url 'service_detail_by_name' service.api.id service.name %}tag/{{pending_tag.service.tag}}"
+                id="goToPendingTag">{%trans 'Tag version ' %} {{pending_tag.service.tag}}</a>{% trans ' is pending second signature' %}.
+        {% endif %}
+    </div>
+{% endif %}
 
 <form id="service_form" novalidate="" style="display: none;">
     <input type="hidden" id="_csrf" value="{{csrf_token}}">
@@ -133,8 +165,8 @@
     </div>
 </div>
 
-{% if parameter_groups %}
-    {% for parameter_group in parameter_groups %}
+{% if service.parameter_groups.count %}
+    {% for parameter_group in service.parameter_groups.all %}
     <div class="parameter-group" id="group_{{parameter_group.id}}">
         <div class="results">
             <table id="result_list">
@@ -174,19 +206,50 @@
                 </thead>
                 <tbody>
                     {% for parameter in parameter_group.parameters.all %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ parameter.name }}</td>
-                            <td>{{ parameter.get_format_display }}</td>
-                            <td>{{ parameter.size }}</td>
-                            <td>{{ parameter.required|yesno:"Sim,Não,Não" }}</td>
-                            <td>{{ parameter.domain_rules }}</td>
-                            <td>
-                                {% if parameter.format == 'AR' %}
-                                    <button type="button">Add</button>
-                                {% endif %}
-                            </td>
-                        </tr>
+                        {% with counter=mycounter.next %}
+                        {% if parameter.parameter_parent == None %}
+                            <tr>
+                                <td>{{ counter }}</td>
+                                <td>{{ parameter.name }}</td>
+                                <td>{{ parameter.get_format_display }}</td>
+                                <td>{{ parameter.size }}</td>
+                                <td>{{ parameter.required|yesno:"Sim,Não,Não" }}</td>
+                                <td>{{ parameter.domain_rules }}</td>
+                                <td style="text-align:right;padding-right:15px;">
+                                    {% if service.tag == 0 %}
+                                        <!-- If not snapshot, service is no longer editable -->
+                                        {% if parameter.format == 'AR' or parameter.format == 'OB' %}
+                                            <button type="button" data-href="{% url 'popup_add_parameter_with_parent' service.id parameter_group.id parameter.id %}" class="parameter_add jpopup">
+                                                <span class="ui-icon ui-icon-plusthick"></span>
+                                            </button>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if parameter.parameter_children.count %}
+                                {% for param in parameter.parameter_children.all %} 
+                                    <tr class="level1">
+                                        <td>{{counter}}.{{ forloop.counter }}</td>
+                                        <td>{{ param.name }}</td>
+                                        <td>{{ param.get_format_display }}</td>
+                                        <td>{{ param.size }}</td>
+                                        <td>{{ param.required|yesno:"Sim,Não,Não" }}</td>
+                                        <td>{{ param.domain_rules }}</td>
+                                            <td style="text-align:right;padding-right:15px;">
+                                                {% if service.tag == 0 %}
+                                                    <!-- If not snapshot, service is no longer editable -->
+                                                    {% if param.format == 'AR' or param.format == 'OB' %}
+                                                        <button type="button" data-href="{% url 'popup_add_parameter_with_parent' service.id parameter_group.id param.id %}" class="parameter_add jpopup">
+                                                            <span class="ui-icon ui-icon-plusthick"></span>
+                                                        </button>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
+                        {% endwith %}
                     {% endfor %}
                 {% else %}
                     <tr>
@@ -237,11 +300,18 @@
         <div class="tag_signature">
             <h3>{% trans 'First signature' %}</h3>
             <div>{% trans 'Digitally signed by' %} {{tag_signature.first_signer.first_name}} {{tag_signature.first_signer.last_name}}
-                {% trans ' at ' %} {{tag_signature.signed_at}}
+                {% trans ' at ' %} {{tag_signature.first_signature_signed_at}}
             </div>
         </div>
 
-        {% if tag_signature.second_signer == None %}
+        {% if tag_signature.second_signer != None %}
+        <div class="tag_signature">
+            <h3>{% trans 'Second signature' %}</h3>
+            <div>{% trans 'Digitally signed by' %} {{tag_signature.second_signer.first_name}} {{tag_signature.second_signer.last_name}}
+                {% trans ' at ' %} {{tag_signature.second_signature_signed_at}}
+            </div>
+        </div>
+        {% else %}
         <div class="tag_signature">
             <h3>{% trans 'Second signature' %}</h3>
             <div>
