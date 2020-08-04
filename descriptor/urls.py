@@ -1,4 +1,5 @@
 from django.urls import path, include
+from django.views.generic import TemplateView
 
 from . import views, rest_urls
 
@@ -17,6 +18,8 @@ urlpatterns = [
     path('service/<int:service_id>/tag/confirm/commit/', views.confirm_new_tag, name='confirm_new_tag'),
 
     path('user/<slug:username>/', views.force_auth, name='force_auth'),
+
+    path('noservices/', TemplateView.as_view(template_name='papiro/noservices.html')),
 
     path('rest/', include(rest_urls)),
 ]

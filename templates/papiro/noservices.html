@@ -1,0 +1,18 @@
+{% extends "papiro/base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block header_insert %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/service-details.css' %}">
+{% endblock %}
+
+{% block main %}
+<div id="title">
+    <div>
+        <h1>Papiro - {% trans 'API administration' %}</h1>
+    </div>
+</div>
+<p style="padding:20px;">
+    {% trans 'Select a service from the navigation menu on the left' %}
+</p>
+{% endblock %}

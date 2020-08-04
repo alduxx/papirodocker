@@ -169,7 +169,7 @@ def popup_add_service(request, api_id):
                 new_pgroup = ParameterGroup(service=service, type=value)
                 new_pgroup.save()
 
-            return HttpResponse(f'<script type="text/javascript">window.opener.location.href = "/api/service/{service.id}/";window.close();</script>')
+            return HttpResponse(f'<script type="text/javascript">window.opener.location.href = window.opener.location.href;window.close();</script>')
     else:
         form = ServiceForm()
 

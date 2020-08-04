@@ -26,6 +26,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/papiro.css' %}?addadfsdfadddf">
 
     <script type="text/javascript">
+        /* Resizes frames to match main container height */
         function resizeFrames(){
             headerHeight = $("#header").outerHeight();
             winHeight = $(window).height();
@@ -35,6 +36,15 @@
         }
 
         $( function() {
+            /* The iframe default src is an empty page /api/noservices/
+               If there is at least one service, sets the iframe src to this first service.*/
+            const numServices = $(".open-in-iframe").length;
+            if(numServices > 0){
+                firstService = $(".open-in-iframe")[0];
+                $("#iframe_details").attr("src", $(firstService).attr("href"));
+            }
+
+            /* Sets jQuery UI Accordion up */
             $( "#accordion" ).accordion({
                 heightStyle: "content",
                 collapsible: true,
@@ -104,7 +114,7 @@
             <div id="service_details">
                 <iframe 
                     id="iframe_details"
-                    src="4/service/consulta_oferta/"
+                    src="/api/noservices/"
                     style="width: 100%;height: 100vh;padding: 0; margin: 0;"
                     frameborder=0>
                 </iframe>
