@@ -1,11 +1,18 @@
-body {
-    margin: 0;
+* {
+    box-sizing: border-box;
     padding: 0;
+    margin: 0;
+}
+
+body {
     font-size: 14px;
     font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
-    border: none;
     color: #333;
     background: #fff;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
 
 a:link, a:visited {
@@ -13,54 +20,51 @@ a:link, a:visited {
     text-decoration: none;
 }
 
-#header {
-    width: auto;
-    height: auto;
+div.content {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px 15px;
-    background-color: #215897;
-    color: #ffc;
-    overflow: hidden;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
 }
 
-#header h1 {
-    padding: 0;
-    margin: 0;
+header {
+    width: 100%;
+    height: 80px;
+    background-color: #99F;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+header > h1 {
+    padding: 0 0 0 20px;
+    margin:0;
     font-weight: 300;
     font-size: 24px;
+    width: 50%;
 }
 
-#user-tools {
-    float: right;
-    padding: 0;
-    margin: 0 0 0 20px;
+header > div{
     font-weight: 300;
     font-size: 11px;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     text-align: right;
+    padding: 0 20px 0 0;
+    margin:0;
+    width: 50%;
 }
 
-#user-tools a {
-    color: white;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+aside {
+    width:300px; 
+    height: 100%;
+    overflow-x: hidden; /* Disable horizontal scroll */
+    border-right: 1px solid #ddd; 
+    letter-spacing: 0.03em;
 }
 
-#side_navigation {
-  height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 22%; /* Set the width of the sidebar */
-  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 1; /* Stay on top */
-  top: 70px; /* Stay at the top */
-  left: 0;
-  overflow-x: hidden; /* Disable horizontal scroll */
-  border-right: 1px solid #ddd; 
-  letter-spacing: 0.03em;
-}
-
-#side_navigation h1 {
+aside > h1 {
     font-weight: 500;
     font-size: 16px;
     margin:0;
@@ -70,25 +74,25 @@ a:link, a:visited {
     border-bottom: 1px solid #CCC;
 }
 
-#side_navigation a {
+aside a {
   text-decoration: none;
   color: #333;
   display: block;
 }
 
-#side_navigation span.desc {
+aside span.desc {
     font-size:10px;
 }
 
-#side_navigation span.empty {
+aside span.empty {
     font-size:12px;
 }
 
-#side_navigation a:hover {
+aside a:hover {
   color: #f1f1f1;
 }
 
-#side_navigation button.add {
+aside button.add {
     font-size: 10px;
     border: none;
     border-radius: 4px;
@@ -156,6 +160,10 @@ a:link, a:visited {
 #accordion a span.patch {color:#163664;}
 #accordion a span.delete {color: #f00;}
 
+main {
+    width: 100%;
+    height: 100%;
+}
 
 /* Style page content */
 #service_details {
@@ -164,14 +172,6 @@ a:link, a:visited {
   position: relative;
 }
 
-
-/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
-@media screen and (max-height: 450px) {
-    /*
-  #side_navigation {padding-top: 15px;}
-  #side_navigation a {font-size: 18px;}
-  */
-}
 
 
 /*

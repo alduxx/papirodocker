@@ -23,18 +23,9 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
     <link rel="manifest" href="{% static 'img/site.webmanifest' %}">
 
-    <link rel="stylesheet" type="text/css" href="{% static 'css/papiro.css' %}?addadfsdfadddf">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/papiro.css' %}?addaddf">
 
     <script type="text/javascript">
-        /* Resizes frames to match main container height */
-        function resizeFrames(){
-            headerHeight = $("#header").outerHeight();
-            winHeight = $(window).height();
-            childrenHeight =  (winHeight - headerHeight - 3) + "px";// 3 because of element borders
-            $("#iframe_details").css("height",  childrenHeight); 
-            $("#side_navigation").css("height",  childrenHeight); 
-        }
-
         $( function() {
             /* The iframe default src is an empty page /api/noservices/
                If there is at least one service, sets the iframe src to this first service.*/
@@ -51,13 +42,7 @@
                 animate: 100
             });
 
-            resizeFrames();
-            $(window).on('resize', function(){
-                resizeFrames();
-            });
-
             $("a.open-in-iframe").click(function(){
-                console.log($(this).attr("href"));
                 $("#iframe_details").attr("src", $(this).attr("href"));
                 return false;
             });
@@ -67,65 +52,51 @@
 </head>
 
 <body>
-    <div id="container">
-        <!-- Header -->
-        <div id="header">
-            <h1 id="site-name">
-                <a href="/api/">
-                    <img src="{% static 'img/logo.png'%}" />
-                </a>
-            </h1> 
+    <header>
+        <h1>
+            <a href="/api/">
+                <img src="{% static 'img/logo.png'%}" />
+            </a>
+        </h1> 
 
-            <div id="user-tools">
-                    {% trans "Welcome" %}, <strong>{{user}}</strong>. <a href="/admin/logout/">{% trans "Logout" %}</a>
-            </div>
+        <div>
+                {% trans "Welcome" %}, <strong>{{user}}</strong>. <a href="/admin/logout/">{% trans "Logout" %}</a>
         </div>
-        <!-- END Header -->
+    </header>
 
-        <!-- Content -->
-        <div id="content" class="flex">
-            <!-- Side Navigation -->
-            <div id="side_navigation">
-                <h1>{% trans 'Projects' %}</h1>
-                <div id="accordion">
-                    {% if api_list %}
-                        {% for api in api_list %}
-                            <h3>{{ api.name }} <span class="services">{{api.services.count}} serviço{{ api.services.count|pluralize:",s" }}</span></h3>
-                            <div>
-                                {% for service in api.services.all %} 
-                                    {% if service.is_snapshot %}
-                                        <a href="/api/{{api.id}}/service/{{service.name}}/" class="open-in-iframe"><span class="http-method {{service.http_method|lower}}">{{service.http_method}}</span>{{service.name}}</a>
-                                    {% endif %}
-                                {% endfor %}
+    <div class="content">
+        <aside>
+            <h1>{% trans 'Projects' %}</h1>
+            <div id="accordion">
+                {% if api_list %}
+                    {% for api in api_list %}
+                        <h3>{{ api.name }} <span class="services">{{api.services.count}} serviço{{ api.services.count|pluralize:",s" }}</span></h3>
+                        <div>
+                            {% for service in api.services.all %} 
+                                {% if service.is_snapshot %}
+                                    <a href="/api/{{api.id}}/service/{{service.name}}/" class="open-in-iframe"><span class="http-method {{service.http_method|lower}}">{{service.http_method}}</span>{{service.name}}</a>
+                                {% endif %}
+                            {% endfor %}
 
-                                <button type="button" data-href="{% url 'popup_add_service' api.id %}" class="add jpopup">
-                                    {% trans "Add service" %}
-                                </button>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <span class="empty">{% trans "No API found" %}</span>
-                    {% endif %}
-                </div>
-                <div style="height:30px" class="spacer"></div>
+                            <button type="button" data-href="{% url 'popup_add_service' api.id %}" class="add jpopup">
+                                {% trans "Add service" %}
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <span class="empty">{% trans "No API found" %}</span>
+                {% endif %}
             </div>
+        </aside>
 
-            <!-- Service details -->
-            <div id="service_details">
-                <iframe 
-                    id="iframe_details"
-                    src="/api/noservices/"
-                    style="width: 100%;height: 100vh;padding: 0; margin: 0;"
-                    frameborder=0>
-                </iframe>
-            </div>
-        </div>
-        <!-- END Content -->
-
-        <!-- Footer -->
-        <div id="footer">
-        </div>
+        <main>
+            <iframe 
+                id="iframe_details"
+                src="/api/noservices/"
+                style="width: 100%;height: 100%;padding: 0; margin: 0;"
+                frameborder=0>
+            </iframe>
+        </main>
     </div>
-    <!-- END Container -->
 </body>
 </html>
